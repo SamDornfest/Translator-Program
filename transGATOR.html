@@ -15,22 +15,24 @@
         });
       }
 
-      function translate(text, source, destination, transBox, englishBox) {
+      function translate(text, source, destination, times, transBox, englishBox) {
+        console.log('looping! ' + times)
         gapi.client.language.translations.list({
           q: text,
           source: source,
           target: destination,
         }).then(function(response) {
-          translation = response.result.data.translations[0].translatedText;
-          sendText(translation, transBox);
-
+          var translation = response.result.data.translations[0].translatedText;
           gapi.client.language.translations.list({
             q: text,
             source: destination,
             target: 'en',
           }).then(function(response) {
-            english = response.result.data.translations[0].translatedText;
+            var english = response.result.data.translations[0].translatedText;
             sendText(english, englishBox);
+            sendText(translation, transBox);
+            
+            //if (times >= 1) { translate(text, source, destination, times - 1, transBox, englishBox) }
           });
         });
       };
@@ -38,21 +40,23 @@
     </script>
 
     <script>
-      function getText() {
-        return document.getElementById("original").value;
+      function getText(id) {
+        return document.getElementById(id).value;
       }
 
       function getNum() {
         return document.getElementById("numBox").value;
       }
 
-      function sendText(text, translationTextArea) {
-        document.getElementById(translationTextArea).value = text;
+      function sendText(text, textarea) {
+        document.getElementById(textarea).value = text;
       }
 
       function createTextAreaDiv(container, id) {
         var div = document.createElement('div');
 
+        div.appendChild(createTextArea("translation-" + id));
+        div.appendChild(createTextArea("english-" + id));
         container.appendChild(div);
       }
 
@@ -63,25 +67,20 @@
       }
 
       function translateText() {
-        var id = 0;
-        var container = document.getElementById('textareas');
-
-        createTextAreaDiv(container, id);
-
-        //loop
-
-
-        // get the div containing the textareas
-        // add a new child textarea for the translation
-        // add another new child textarea for the english
-        // pass both (not by id) to the translate method.
-        var text = getText();
+        var first = true;
         var num = getNum();
-        
-        // for (i = 0; i < num; i++) {
-        //   result = translate(text);
-        // }
-        // sendText(result);
+        var container = document.getElementById('textareas');
+        id = 1;//for (var id = 1; id <= num; id++) {
+          createTextAreaDiv(container, id);
+          var text;
+          if (first){
+            text = getText('english-0')
+            first = false;
+          } else {
+             text = getText('translation-' + (id - 1));
+          }
+          translate(text, 'en', 'ja', num, 'translation-' + id, 'english-' + id);
+        //}
       }
     </script>
   </head>
@@ -92,7 +91,7 @@
       <input type="number" id=numBox placeholder="Repeats"></input>
     </div>
     <div id="box1">
-      <textarea id="original" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
+      <textarea id="english-0" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
     </div>
     <div id="textareas"></div>
     <div>
