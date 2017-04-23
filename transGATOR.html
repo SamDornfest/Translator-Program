@@ -15,16 +15,23 @@
         });
       }
 
-      function translate(text) {
+      function translate(text, source, destination, transBox, englishBox) {
         gapi.client.language.translations.list({
           q: text,
-          source: 'en',
-          target: 'ja',
+          source: source,
+          target: destination,
         }).then(function(response) {
-          result = response.result.data.translations[0].translatedText;
-          sendText(result);
-        }, function(reason) {
-          console.log('Error: ' + reason.result.error.message);
+          translation = response.result.data.translations[0].translatedText;
+          sendText(translation, transBox);
+
+          gapi.client.language.translations.list({
+            q: text,
+            source: destination,
+            target: 'en',
+          }).then(function(response) {
+            english = response.result.data.translations[0].translatedText;
+            sendText(english, englishBox);
+          });
         });
       };
       gapi.load('client', start);
@@ -39,15 +46,14 @@
         return document.getElementById("numBox").value;
       }
 
-      function sendText(text) {
-        document.getElementById("textBox2").value = text;
+      function sendText(text, translationTextArea) {
+        document.getElementById(translationTextArea).value = text;
       }
 
       function translateText() {
         var text = getText();
         var num = getNum();
-        var result = translate(text);
-        console.log(result);
+        translate(text, 'en', 'ja', 'textBox2', 'textBox3');
         
         // for (i = 0; i < num; i++) {
         //   result = translate(text);
@@ -63,8 +69,9 @@
       <input type="number" id=numBox placeholder="Repeats"></input>
     </div>
     <div id="box1">
-      <textarea name="textBox" id="textBox1" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
-      <textarea name="resultBox" id="textBox2" cols="47" rows="17" readonly></textarea>
+      <textarea id="textBox1" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
+      <textarea id="textBox2" cols="47" rows="17" readonly></textarea>
+      <textarea id="textBox3" cols="47" rows="17" readonly></textarea>
     </div>
     <div>
       <button onclick="translateText();">Translate</button>
