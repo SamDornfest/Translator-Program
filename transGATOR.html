@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <style>
+      body {
+        background-color: lightblue;
+      }
+    </style>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+      function start() {
+        // Initializes the client with the API key and the Translate API.
+        gapi.client.init({
+          'apiKey': 'AIzaSyDXmAYC-WkrgiWimcbfShajOCPj1LOJaus',
+          'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/translate/v2/rest'],
+        });
+      }
+
+      function translate(text) {
+        gapi.client.language.translations.list({
+          q: text,
+          source: 'en',
+          target: 'ja',
+        }).then(function(response) {
+          result = response.result.data.translations[0].translatedText;
+          sendText(result);
+        }, function(reason) {
+          console.log('Error: ' + reason.result.error.message);
+        });
+      };
+      gapi.load('client', start);
+    </script>
+
+    <script>
+      function getText() {
+        return document.getElementById("textBox1").value;
+      }
+
+      function getNum() {
+        return document.getElementById("numBox").value;
+      }
+
+      function sendText(text) {
+        document.getElementById("textBox2").value = text;
+      }
+
+      function translateText() {
+        var text = getText();
+        var num = getNum();
+        var result = translate(text);
+        console.log(result);
+        
+        // for (i = 0; i < num; i++) {
+        //   result = translate(text);
+        // }
+        // sendText(result);
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1> Wacky Translator - By Sam Dornfest </h1>
+    <div id="testo">
+      <input type="number" id=numBox placeholder="Repeats"></input>
+    </div>
+    <div id="box1">
+      <textarea name="textBox" id="textBox1" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
+      <textarea name="resultBox" id="textBox2" cols="47" rows="17" readonly></textarea>
+    </div>
+    <div>
+      <button onclick="translateText();">Translate</button>
+    </div>
+  </body>
+</html>
