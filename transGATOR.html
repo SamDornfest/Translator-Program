@@ -39,7 +39,7 @@
 
     <script>
       function getText() {
-        return document.getElementById("textBox1").value;
+        return document.getElementById("original").value;
       }
 
       function getNum() {
@@ -50,10 +50,33 @@
         document.getElementById(translationTextArea).value = text;
       }
 
+      function createTextAreaDiv(container, id) {
+        var div = document.createElement('div');
+
+        container.appendChild(div);
+      }
+
+      function createTextArea(id) {
+        var textarea = document.createElement('textarea');
+        textarea.id = id;
+        return textarea;
+      }
+
       function translateText() {
+        var id = 0;
+        var container = document.getElementById('textareas');
+
+        createTextAreaDiv(container, id);
+
+        //loop
+
+
+        // get the div containing the textareas
+        // add a new child textarea for the translation
+        // add another new child textarea for the english
+        // pass both (not by id) to the translate method.
         var text = getText();
         var num = getNum();
-        translate(text, 'en', 'ja', 'textBox2', 'textBox3');
         
         // for (i = 0; i < num; i++) {
         //   result = translate(text);
@@ -69,10 +92,9 @@
       <input type="number" id=numBox placeholder="Repeats"></input>
     </div>
     <div id="box1">
-      <textarea id="textBox1" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
-      <textarea id="textBox2" cols="47" rows="17" readonly></textarea>
-      <textarea id="textBox3" cols="47" rows="17" readonly></textarea>
+      <textarea id="original" cols="47" rows="17" placeholder="Add text here to be translated"></textarea>
     </div>
+    <div id="textareas"></div>
     <div>
       <button onclick="translateText();">Translate</button>
     </div>
